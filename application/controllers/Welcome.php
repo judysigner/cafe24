@@ -26,11 +26,11 @@ class Welcome extends CI_Controller {
 		$this->load->view('welcome_message');
 	}
 
-public function page2()
-{
-	echo "주디짱 흥해라";
-	exit;
-	
-}
+	public function page2()
+	{
+		echo "주디짱 개귀엽다";
+		exit;
+		
+	}
 
 }
