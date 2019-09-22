@@ -1,1 +1,39 @@
-뷰는 퍼블리셔였다.
+<div class="container">
+    <div id = "profile_app">
+        <div v-for="ce in careers">
+            {{ce.content}}
+        </div>
+    </div>
+
+</div>
+<script>
+
+    var profile_app = new Vue({
+        el:'#profile_app',
+        data: {
+            careers:[],
+        },
+        methods: {
+            listload:function(){
+                var vm = this;
+                $.ajax({
+                    type:'GET',
+                    url:'/page/data_json/careers',
+                    dataType:'json',
+                    success:function(res){
+                        if(res.code==200){
+                            vm.careers = res.result.careers;
+                        }
+                    }
+                });    
+            },
+        },
+        created:function(){
+            this.listload();
+
+        },
+        updated:{}
+
+    })
+
+</script>
