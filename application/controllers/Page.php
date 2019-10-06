@@ -66,6 +66,55 @@ class Page extends CI_Controller
     echo $html;
   }
 
+  public function chk_passwd(){
+
+    $passwd = $this->input->post('passwd');
+
+    if($passwd =="1234"){
+      
+      $this->session->set_userdata('is_adm','Y');
+
+      $json['code'] = 200;
+      $json['massge'] = "확인되었습니다.";
+    }else{
+      $json['code'] = 500;
+      $json['message'] = "비밀번호가 일치하지 않습니다." ;
+    }
+    
+    echo json_encode($json);
+  
+  }
+    
+public function add_career(){
+
+  $new_career = $this->input->post('new_career');
+  if(strlen($new_career) <3){
+    $json['code'] = 500;
+    $json['message'] = "너무 짧게 입력하셨습니다.";
+  }else{
+
+    $new_step = $this->db->select(' max(step)+1 as step ') -> get('careers') ->row_array()[step];
+    if(!$new_step) $new_step = 1;
+
+    $in_data['content'] = $new_career;
+    $in_data['step'] = $new_step;
+    $in_data['updated'] = date("Y-m-d H:i:s");
+    $in_data['created'] = date("Y-m-d H:i:s");
+
+    if($this->db->insert('careers',$in_data)){
+      $json['code'] = 200;
+      $json['result'] = $in_data;
+    }else{
+      $json['code'] = 500;
+      $json['massage'] = 'DB 입력에 실패하였습니다.';
+    }
+  }
+
+  echo json_encode($json);
+  
+}
+
+
 public function data_json($mode=''){
   if($mode == 'careers'){
     $json['code'] = 200;

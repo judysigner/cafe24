@@ -1,17 +1,70 @@
-<div class="container">
-    <div id = "profile_app">
-        <div v-for="ce in careers">
-            {{ce.content}}
-        </div>
+<style>
+    .page_title{
+        height: 300px;
+        padding-top:  140px;
+        background-color: #eeeeee;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .profile_history_items{
+        padding: 15px;
+        border: 1px solid #eeeeee;
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+
+
+    
+</style>
+
+
+<div id="profile_app">
+    <div class="page_title">
+        <h3><?=$page_tilte?></h3>
     </div>
 
+
+    <div class="container">
+        <div id = "profile_app">
+            <div v-for="ce in careers" class="profile_history_items row">
+                <div class="col-10">
+                    <h5>{{ce.content}}</h5>
+                </div>
+                <div class="col-2 text-right">
+                    <a href="" v-if="is_adm =='Y' ">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center" v-if="is_adm =='Y'">
+                <button type="button" class="btn btn-md btn-info" v-on:click="add_careers()">
+                    <i class="fa fa-plus"></i> 추가
+                </button>
+        </div>
+
+        <div class="text-center" v-else>
+                <button type="button" class="btn btn-md btn-info" v-on:click="adm_chk()">
+                    <i class="fa fa-user"></i> ADMIN
+                </button>
+        </div>
+
+    </div>
 </div>
+
+
+
+
+
 <script>
 
     var profile_app = new Vue({
         el:'#profile_app',
         data: {
             careers:[],
+            is_adm:'<?=$_SESSION[is_adm]?>',
         },
         methods: {
             listload:function(){
@@ -27,6 +80,60 @@
                     }
                 });    
             },
+
+            add_careers:function(){
+                var vm = this;
+                bootbox.prompt({
+                    title: "신규 커리어를 입력하세요.", 
+                    centerVertical: true,
+                    callback: function(result){ 
+                        $.ajax({
+                            type:"POST",
+                            url:"/page/add_career",
+                            data:{
+                                new_career:result
+                            },
+                            dataType:'json',
+                            success:function(res){
+                                if(res.code==200){
+                                    vm.careers.push(res.result);
+                                } else {
+                                    alert(res.message);
+                                }
+                            }
+                        })
+                    }
+                });
+            },
+
+            
+            adm_chk:function(){
+                var vm = this;
+                bootbox.prompt({
+                title: "비밀번호를 입력하세요", 
+                centerVertical: true,
+                inputType:'password',
+                callback: function(result){ 
+                    $.ajax({
+                        type:'POST',
+                        url:'/page/chk_passwd',
+                        data:{
+                            passwd:result
+                        },
+                        dataType:'json',
+                        success:function(res){
+                            if(res.code==200){
+                                //location.reload();//
+                                vm.is_adm = 'Y';
+                            } else {
+                                vm.is_adm = '';
+                                alert(res.message);
+                            }
+                        }
+                    }); 
+                }
+            });
+            }
         },
         created:function(){
             this.listload();
